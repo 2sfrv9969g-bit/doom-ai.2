@@ -1,0 +1,687 @@
+
+
+<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="theme-color" content="#061313">
+
+<title>DOOM AI</title>
+
+<style>
+
+* { box-sizing:border-box; }
+
+body {
+
+ margin:0;
+
+ background:#031012;
+
+ color:#c9ffff;
+
+ font-family:Arial,sans-serif;
+
+ overflow-x:hidden;
+
+}
+
+header {
+
+ padding:20px;
+
+ display:flex;
+
+ justify-content:space-between;
+
+ border-bottom:1px solid #15504d;
+
+ letter-spacing:3px;
+
+ color:#42e9d1;
+
+}
+
+header small {
+
+ display:block;
+
+ color:#8da8a5;
+
+ font-size:9px;
+
+ margin-top:7px;
+
+}
+
+.clock { font-size:20px; }
+
+.dashboard {
+
+ display:grid;
+
+ grid-template-columns:1fr 1fr 1fr;
+
+ gap:15px;
+
+ padding:20px;
+
+ min-height:65vh;
+
+ align-items:center;
+
+}
+
+.panel {
+
+ background:rgba(0,35,36,.65);
+
+ border:1px solid #12615a;
+
+ border-radius:12px;
+
+ padding:16px;
+
+ box-shadow:0 0 15px #00a58a22;
+
+}
+
+.panel h3 {
+
+ font-size:12px;
+
+ letter-spacing:3px;
+
+ color:#35dcca;
+
+}
+
+.status {
+
+ display:flex;
+
+ justify-content:space-between;
+
+ font-size:11px;
+
+ margin:22px 0;
+
+}
+
+.status span:last-child { color:#35e8d2; }
+
+.bar {
+
+ height:5px;
+
+ background:#173b3b;
+
+ margin-top:8px;
+
+ border-radius:10px;
+
+}
+
+.bar div {
+
+ height:100%;
+
+ width:85%;
+
+ background:#27e8d1;
+
+ box-shadow:0 0 10px #27e8d1;
+
+ border-radius:10px;
+
+}
+
+.core-area {
+
+ text-align:center;
+
+}
+
+.core {
+
+ width:190px;
+
+ height:190px;
+
+ border:2px solid #35e9c7;
+
+ border-radius:50%;
+
+ margin:auto;
+
+ display:flex;
+
+ justify-content:center;
+
+ align-items:center;
+
+ background:radial-gradient(circle,#7affd9,#087e65 25%,#031b20 70%);
+
+ box-shadow:0 0 35px #20f5bc, inset 0 0 30px #21ffd0;
+
+ animation:pulse 3s infinite;
+
+}
+
+.core span {
+
+ font-size:50px;
+
+ color:white;
+
+ text-shadow:0 0 20px white;
+
+}
+
+@keyframes pulse {
+
+ 50% { transform:scale(1.06); box-shadow:0 0 65px #20f5bc; }
+
+}
+
+.core-label {
+
+ color:#48f5dc;
+
+ letter-spacing:5px;
+
+ font-size:11px;
+
+ margin-top:25px;
+
+}
+
+.history {
+
+ font-size:12px;
+
+ line-height:1.7;
+
+ color:#b6d4d0;
+
+ min-height:140px;
+
+ max-height:220px;
+
+ overflow:auto;
+
+}
+
+.wave {
+
+ display:flex;
+
+ justify-content:center;
+
+ align-items:center;
+
+ gap:3px;
+
+ height:65px;
+
+ overflow:hidden;
+
+}
+
+.wave i {
+
+ display:block;
+
+ width:3px;
+
+ height:12px;
+
+ background:#32e9d0;
+
+ border-radius:5px;
+
+ box-shadow:0 0 7px #32e9d0;
+
+ animation:wave 1s infinite alternate;
+
+}
+
+.wave i:nth-child(3n) { animation-delay:.3s; }
+
+.wave i:nth-child(2n) { animation-delay:.6s; }
+
+@keyframes wave {
+
+ to { height:45px; }
+
+}
+
+footer {
+
+ position:relative;
+
+ padding:15px;
+
+ border-top:1px solid #13514d;
+
+ background:#041416;
+
+}
+
+.controls {
+
+ display:flex;
+
+ justify-content:center;
+
+ flex-wrap:wrap;
+
+ gap:10px;
+
+}
+
+button {
+
+ background:#062d2b;
+
+ color:#51efdc;
+
+ border:1px solid #258d80;
+
+ border-radius:8px;
+
+ padding:13px 17px;
+
+ font-size:12px;
+
+}
+
+button:active { background:#11665d; }
+
+button.active {
+
+ background:#087b65;
+
+ color:white;
+
+}
+
+#message {
+
+ width:100%;
+
+ margin-top:15px;
+
+ padding:15px;
+
+ background:#061d20;
+
+ color:white;
+
+ border:1px solid #258d80;
+
+ border-radius:8px;
+
+ font-size:15px;
+
+}
+
+#response {
+
+ color:#a8ddd4;
+
+ text-align:center;
+
+ font-size:13px;
+
+ padding:12px;
+
+ min-height:40px;
+
+}
+
+@media(max-width:650px) {
+
+ .dashboard {
+
+  grid-template-columns:1fr;
+
+  padding:12px;
+
+  gap:12px;
+
+ }
+
+ .core-area { grid-row:1; padding:20px 0; }
+
+ .core { width:155px;height:155px; }
+
+ .panel { padding:13px; }
+
+ header { padding:16px 12px; }
+
+ .clock { font-size:15px; }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+ <div>
+
+  DOOM AI
+
+  <small>PERSONAL NEURAL INTERFACE • ONLINE</small>
+
+ </div>
+
+ <div class="clock" id="clock">00:00:00</div>
+
+</header>
+
+<main class="dashboard">
+
+<section class="panel">
+
+ <h3>SYSTEM STATUS</h3>
+
+ <div class="status">
+
+  STATUS <span id="status">READY</span>
+
+ </div>
+
+ <div class="status">
+
+  MODE <span>AUTO</span>
+
+ </div>
+
+ <div class="status">
+
+  VOICE <span>TR-TR</span>
+
+ </div>
+
+ <p>NEURAL THROUGHPUT</p>
+
+ <div class="bar"><div></div></div>
+
+ <p>CORE LOAD</p>
+
+ <div class="bar"><div style="width:31%"></div></div>
+
+ <p>SIGNAL</p>
+
+ <div class="bar"><div style="width:99%"></div></div>
+
+</section>
+
+<section class="core-area">
+
+ <div class="core">
+
+  <span>✦</span>
+
+ </div>
+
+ <div class="core-label" id="coreLabel">
+
+  DOOM AI READY
+
+ </div>
+
+</section>
+
+<section class="panel">
+
+ <h3>BRIEFING HISTORY</h3>
+
+ <div class="history" id="history">
+
+  Sistem başlatıldı.<br>
+
+  Bedirhan için kişisel asistan hazır.<br>
+
+  Ses sistemi beklemede.
+
+ </div>
+
+</section>
+
+</main>
+
+<div class="wave" id="wave">
+
+</div>
+
+<div id="response">
+
+ İyi akşamlar Bedirhan. Seni dinlemeye hazırım.
+
+</div>
+
+<footer>
+
+ <div class="controls">
+
+  <button onclick="listen()" id="mic">🎙 KONUŞ</button>
+
+  <button onclick="speakLast()">🔊 TEKRAR DİNLE</button>
+
+  <button onclick="stopVoice()">■ DURDUR</button>
+
+ </div>
+
+ <input id="message" placeholder="DOOM AI'ye mesaj yaz..."
+
+ onkeydown="if(event.key==='Enter')sendMessage()">
+
+ <div class="controls" style="margin-top:10px">
+
+  <button onclick="sendMessage()">GÖNDER ➤</button>
+
+ </div>
+
+</footer>
+
+<script>
+
+const clock = document.getElementById("clock");
+
+const response = document.getElementById("response");
+
+const statusText = document.getElementById("status");
+
+const coreLabel = document.getElementById("coreLabel");
+
+const history = document.getElementById("history");
+
+let lastAnswer = "";
+
+setInterval(() => {
+
+ clock.textContent = new Date().toLocaleTimeString("tr-TR");
+
+},1000);
+
+const wave = document.getElementById("wave");
+
+for(let i=0;i<100;i++){
+
+ const bar=document.createElement("i");
+
+ wave.appendChild(bar);
+
+}
+
+function addHistory(text){
+
+ const line=document.createElement("p");
+
+ line.textContent=text;
+
+ history.appendChild(line);
+
+ history.scrollTop=history.scrollHeight;
+
+}
+
+function answer(text){
+
+ lastAnswer=text;
+
+ response.textContent=text;
+
+ coreLabel.textContent="PROCESSING";
+
+ statusText.textContent="SPEAKING";
+
+ addHistory("DOOM: "+text);
+
+ const utterance=new SpeechSynthesisUtterance(text);
+
+ utterance.lang="tr-TR";
+
+ utterance.rate=0.88;
+
+ utterance.pitch=0.75;
+
+ utterance.onend=()=>{
+
+  statusText.textContent="READY";
+
+  coreLabel.textContent="DOOM AI READY";
+
+ };
+
+ speechSynthesis.cancel();
+
+ speechSynthesis.speak(utterance);
+
+}
+
+function sendMessage(){
+
+ const input=document.getElementById("message");
+
+ const text=input.value.trim();
+
+ if(!text)return;
+
+ addHistory("BEDİRHAN: "+text);
+
+ input.value="";
+
+ // Bu ilk sürüm demo yanıtıdır.
+
+ answer("Bedirhan, mesajını aldım. Gerçek yapay zekâ bağlantım henüz kurulmadı. Bağlantı kurulduğunda sorularını yanıtlayabileceğim.");
+
+}
+
+function speakLast(){
+
+ if(lastAnswer){
+
+  speechSynthesis.cancel();
+
+  const u=new SpeechSynthesisUtterance(lastAnswer);
+
+  u.lang="tr-TR";
+
+  u.rate=0.88;
+
+  u.pitch=0.75;
+
+  speechSynthesis.speak(u);
+
+ }
+
+}
+
+function stopVoice(){
+
+ speechSynthesis.cancel();
+
+ statusText.textContent="READY";
+
+ coreLabel.textContent="DOOM AI READY";
+
+}
+
+function listen(){
+
+ const Recognition=window.SpeechRecognition ||
+
+                   window.webkitSpeechRecognition;
+
+ if(!Recognition){
+
+  response.textContent="Tarayıcın ses tanımayı desteklemiyor.";
+
+  return;
+
+ }
+
+ const recognition=new Recognition();
+
+ recognition.lang="tr-TR";
+
+ recognition.interimResults=false;
+
+ statusText.textContent="LISTENING";
+
+ coreLabel.textContent="LISTENING";
+
+ recognition.onresult=(event)=>{
+
+  document.getElementById("message").value=
+
+  event.results[0][0].transcript;
+
+  sendMessage();
+
+ };
+
+ recognition.onerror=()=>{
+
+  response.textContent="Mikrofon erişimini kontrol et.";
+
+  statusText.textContent="READY";
+
+  coreLabel.textContent="DOOM AI READY";
+
+ };
+
+ recognition.onend=()=>{
+
+  if(statusText.textContent==="LISTENING"){
+
+   statusText.textContent="READY";
+
+   coreLabel.textContent="DOOM AI READY";
+
+  }
+
+ };
+
+ recognition.start();
+
+}
+
+</script>
+
+</body>
+
+</html>
